@@ -1,7 +1,7 @@
 # Assignment 2 Resources
 
-
 ## The HTML Markup Template
+
 ```html
  
 <tr>
@@ -13,4 +13,10 @@
   <td>NUMBER OF RATINGS HERE</td>
 </tr>
  
-```# assignment-2
+```
+
+## Assignment-2
+
+Client Side Scripting
+
+Richard Possberg - CPSC1520
