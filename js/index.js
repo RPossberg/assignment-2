@@ -80,12 +80,12 @@ let template = "";
 albumStore.forEach((album) => {
   template += `
     <tr>
-      <td>${album.albumName}</td>
+      <td>${album.album}</td>
       <td>${album.releaseDate}</td>
       <td>${album.artistName}</td>
-      <td>${album.genre}</td>
+      <td>${album.genres}</td>
       <td>${album.averageRating}</td>
-      <td>${album.numberRating}</td>
+      <td>${album.numberRatings}</td>
     </tr>
   `;
 });
