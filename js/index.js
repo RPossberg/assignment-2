@@ -103,20 +103,22 @@ tableCells.forEach((cell) => {
   });
 });
 
-// Sort the data by a specific field in the table
-function sortDataByField(field) {
-  albumStore.sort((a, b) => {
-    if (a[field] < b[field]) {
-      return -1;
-    }
-    if (a[field] > b[field]) {
-      return 1;
-    }
-    return 0;
-  });
+// Sort the data by a specific header in the table
+const albumHeader = document.querySelector("th[scope='col']:first-child");
+albumHeader.addEventListener("click", () => {
+  sortDataByField("album");
+});
 
-  render(albumStore);
-}
+const artistHeader = document.querySelector("th[scope='col']:nth-child(3)");
+artistHeader.addEventListener("click", () => {
+  sortDataByField("artistName");
+  console.log("Artist header clicked");
+});
+
+const genreHeader = document.querySelector("th[scope='col']:nth-child(4)");
+genreHeader.addEventListener("click", () => {
+  sortDataByField("genres");
+});
 
 // Sort the data by release date field
 const releaseDateCell = document.querySelector("#release-date-cell");
