@@ -103,18 +103,6 @@ tableCells.forEach((cell) => {
   });
 });
 
-// Add event listeners to the average rating and number of ratings cells for sorting
-const averageRatingCell = document.querySelector("#average-rating-cell");
-const numberOfRatingsCell = document.querySelector("#number-of-ratings-cell");
-
-averageRatingCell.addEventListener("click", () => {
-  sortDataByField("averageRating");
-});
-
-numberOfRatingsCell.addEventListener("click", () => {
-  sortDataByField("numberRating");
-});
-
 // Sort the data by a specific field in the table
 function sortDataByField(field) {
   albumStore.sort((a, b) => {
@@ -134,6 +122,7 @@ function sortDataByField(field) {
 const releaseDateCell = document.querySelector("#release-date-cell");
 releaseDateCell.addEventListener("click", () => {
   sortDataByReleaseDate();
+  console.log("Release date cell clicked");
 });
 
 function sortDataByReleaseDate() {
@@ -214,3 +203,24 @@ function render(data) {
   });
   table.innerHTML = template;
 }
+
+// Add event listeners to the table cells
+tableCells.forEach((cell) => {
+  cell.addEventListener("click", (event) => {
+    // Handle the click event here
+    console.log("Cell clicked: ", event.target.textContent);
+  });
+});
+
+// Add event listeners to the average rating and number of ratings cells for sorting
+const averageRatingCell = document.querySelector("#average-rating-cell");
+const numberOfRatingsCell = document.querySelector("#number-of-ratings-cell");
+
+averageRatingCell.addEventListener("click", () => {
+  sortDataByField("averageRating");
+  console.log("Average rating cell clicked");
+});
+
+numberOfRatingsCell.addEventListener("click", () => {
+  sortDataByField("numberRating");
+});
