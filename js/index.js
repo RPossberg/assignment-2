@@ -31,16 +31,62 @@ Get the search query and minimum rating.
   <td>NUMBER OF RATINGS HERE</td>
 </tr>;
 */
+/* 
+  Top Level References 
+</tr> 
+*/
 
-// Create an async function to load the album data.
-async function loadAlbumData() {
-  const response = await fetch("./public/data/albums.json");
-  const data = await response.json();
-  return data;
+let store;
+// clone the node that way you can make copyies of it when you need one
+// no additional memory.
+let tbody = document.querySelector("tbody").cloneNode(true);
+//filtering
+const reviewFilter = document.querySelector("reviews");
+//filtering
+const ratingsFilter = document.querySelector("ratings");
+// two searchs
+const searchFilterForm = document.querySelector("form");
+// add listeners... for the filter action to perfrom
+
+async function appInit() {
+  const res = await fetch("public/data/albums.json");
+  const payload = await res.json();
+  renderAlbums(payload);
+}
+
+appInit();
+//
+function renderAlbums(data) {
+  const container = tbody.cloneNode(true);
+  data.forEach(
+    ({
+      album,
+      artistName,
+      releaseDate,
+      genres,
+      averageRatings,
+      numberRatings,
+    }) => {
+      const template = `
+    <tr>
+    <td>${album}</td>
+    <td>${artistName}</td>
+    <td>${releaseDate}</td>
+    <td>${genres}</td>
+    <td>${averageRatings}</td>
+    <td>${numberRatings}</td>
+  </tr>
+    `;
+      container.insertAdjacentHTML("beforeend", template);
+    }
+  );
+
+  document.querySelector("tbody").replaceWith(container);
 }
 
 // Fetch the album data from the projects data folder (albums.json).
 const albumData = await loadAlbumData();
+
 let albumStore = [...albumData];
 
 // Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
@@ -107,6 +153,7 @@ tableCells.forEach((cell) => {
 const albumHeader = document.querySelector("th[scope='col']:first-child");
 albumHeader.addEventListener("click", () => {
   sortDataByField("album");
+  console.log("Album header clicked");
 });
 
 const artistHeader = document.querySelector("th[scope='col']:nth-child(3)");
