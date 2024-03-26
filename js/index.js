@@ -31,13 +31,14 @@ Get the search query and minimum rating.
   <td>NUMBER OF RATINGS HERE</td>
 </tr>;
 */
-/* 
-  Top Level References 
-</tr> 
+// Add event listeners to the table cells
+/*
+  Top Level References
+</tr>;
 */
 
 let store;
-// clone the node that way you can make copyies of it when you need one
+// clone the node that way you can make copies of it when you need one
 // no additional memory.
 let tbody = document.querySelector("tbody").cloneNode(true);
 //filtering
@@ -48,16 +49,18 @@ const ratingsFilter = document.querySelector("ratings");
 const searchFilterForm = document.querySelector("form");
 // add listeners... for the filter action to perfrom
 
+// add event listener to the form element to filter the data
 async function appInit() {
   const res = await fetch("public/data/albums.json");
   const payload = await res.json();
   renderAlbums(payload);
 }
 
-appInit();
-//
+appInit(); // call the function to load the data
+
+// Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
 function renderAlbums(data) {
-  const container = tbody.cloneNode(true);
+  const container = tbody.cloneNode(true); // clone the node when you need one
   data.forEach(
     ({
       album,
@@ -77,16 +80,24 @@ function renderAlbums(data) {
     <td>${numberRatings}</td>
   </tr>
     `;
-      container.insertAdjacentHTML("beforeend", template);
+      container.insertAdjacentHTML("beforeend", template); // add the template to the container
     }
   );
-
+  // replace the tbody with the container that has the template
   document.querySelector("tbody").replaceWith(container);
 }
 
 // Fetch the album data from the projects data folder (albums.json).
 const albumData = await loadAlbumData();
 
+// Create an async function to load the album data.
+async function loadAlbumData() {
+  const response = await fetch("public/data/albums.json");
+  const data = await response.json();
+  return data;
+}
+
+// Create a variable called albumStore and assign the album data to it.
 let albumStore = [...albumData];
 
 // Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
@@ -110,7 +121,7 @@ let albumStoreCopy = [...albumStore];
 // Create a copy of the array data then use display templating to render the data and template into the table. add the album data into the table. Add the template data to the correct section of the table element.
 const table = document.querySelector("table");
 
-// Add header fields
+// Add header fields to the table
 let header = `
   <tr>
     <th>Album Name</th>
@@ -122,6 +133,7 @@ let header = `
   </tr>
 `;
 
+// Add the album data to the table using display templating
 let template = "";
 albumStore.forEach((album) => {
   template += `
@@ -136,12 +148,13 @@ albumStore.forEach((album) => {
   `;
 });
 
+// Add the template data to the correct section of the table element
 table.innerHTML = header + template;
 
 // After the table has been rendered
 const tableCells = document.querySelectorAll("td");
 
-// Add event listeners to the table cells
+// Add event listeners to the table cells for sorting
 tableCells.forEach((cell) => {
   cell.addEventListener("click", (event) => {
     // Handle the click event here
@@ -150,10 +163,18 @@ tableCells.forEach((cell) => {
 });
 
 // Sort the data by a specific header in the table
-const albumHeader = document.querySelector("th[scope='col']:first-child");
+const albumHeader = document.querySelector("th[scope='col']:nth-child(1)");
 albumHeader.addEventListener("click", () => {
   sortDataByField("album");
   console.log("Album header clicked");
+});
+
+const releaseDateHeader = document.querySelector(
+  "th[scope='col']:nth-child(2)"
+);
+releaseDateHeader.addEventListener("click", () => {
+  sortDataByField("releaseDate");
+  console.log("Release date header clicked");
 });
 
 const artistHeader = document.querySelector("th[scope='col']:nth-child(3)");
@@ -167,22 +188,52 @@ genreHeader.addEventListener("click", () => {
   sortDataByField("genres");
 });
 
-// Sort the data by release date field
-const releaseDateCell = document.querySelector("#release-date-cell");
-releaseDateCell.addEventListener("click", () => {
-  sortDataByReleaseDate();
-  console.log("Release date cell clicked");
+const averageRatingHeader = document.querySelector(
+  "th[scope='col']:nth-child(5)"
+);
+averageRatingHeader.addEventListener("click", () => {
+  sortDataByField("averageRating");
+  console.log("Average rating header clicked");
 });
 
-function sortDataByReleaseDate() {
+const numberRatingsHeader = document.querySelector(
+  "th[scope='col']:nth-child(6)"
+);
+numberRatingsHeader.addEventListener("click", () => {
+  sortDataByField("numberRatings");
+});
+
+// Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
+function sortDataByField(field) {
   albumStore.sort((a, b) => {
-    const dateA = new Date(a.releaseDate);
-    const dateB = new Date(b.releaseDate);
-    return dateB - dateA;
+    if (a[field] < b[field]) {
+      return 1;
+    }
+    if (a[field] > b[field]) {
+      return -1;
+    }
+    return 0;
   });
 
   render(albumStore);
 }
+
+// // Sort the data by release date field
+// const releaseDateCell = document.querySelector("#release-date-cell");
+// releaseDateCell.addEventListener("click", () => {
+//   sortDataByReleaseDate();
+//   console.log("Release date cell clicked");
+// });
+
+// function sortDataByReleaseDate() {
+//   albumStore.sort((a, b) => {
+//     const dateA = new Date(a.releaseDate);
+//     const dateB = new Date(b.releaseDate);
+//     return dateB - dateA;
+//   });
+
+//   render(albumStore);
+// }
 
 // Add submit event listener to the form element
 const form = document.querySelector("form");
