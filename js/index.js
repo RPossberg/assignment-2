@@ -162,10 +162,10 @@ tableCells.forEach((cell) => {
   });
 });
 
-// Sort the data by a specific header in the table
+// Sort the data by a specific field in the table when the header is clicked
 const albumHeader = document.querySelector("th[scope='col']:nth-child(1)");
 albumHeader.addEventListener("click", () => {
-  sortDataByField("album");
+  sortDataByField("albumName");
   console.log("Album header clicked");
 });
 
