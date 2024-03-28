@@ -49,7 +49,6 @@ function onAlbumSearch(e) {
   const formData = new FormData(e.currentTarget);
   const query = formData.get("search");
   const rating = formData.get("rating");
-
   const albums = searchFilter(query, store);
 }
 
