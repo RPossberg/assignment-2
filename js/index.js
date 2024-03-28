@@ -1,4 +1,3 @@
-console.log("index.js loaded");
 /*
 CPSC1520 Client-Side Development
 *Task 1: Data Fetch and Display Templating
@@ -38,27 +37,42 @@ Get the search query and minimum rating.
 */
 
 let store;
-// clone the node that way you can make copies of it when you need one
-// no additional memory.
-let tbody = document.querySelector("tbody").cloneNode(true);
-//filtering
-const reviewFilter = document.querySelector("reviews");
-//filtering
-const ratingsFilter = document.querySelector("ratings");
-// two searchs
-const searchFilterForm = document.querySelector("form");
-// add listeners... for the filter action to perfrom
 
-// add event listener to the form element to filter the data
-async function appInit() {
-  const res = await fetch("public/data/albums.json");
-  const payload = await res.json();
-  renderAlbums(payload);
+let tbody = document.querySelector("tbody").cloneNode(true);
+const reviewFilter = document.getElementById("reviews");
+const ratingsFilter = document.getElementById("ratings");
+const albumForm = document.querySelector("form");
+albumForm.addEventListener("submit", onAlbumSearch);
+
+function onAlbumSearch(e) {
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
+  const query = formData.get("search");
+  const rating = formData.get("rating");
+
+  const albums = searchFilter(query, store);
 }
 
-appInit(); // call the function to load the data
+function searchFilter(query, data) {
+  const queryString = query.toLowerCase();
 
-// Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
+  const results = data.filter((album) => {
+    return (
+      album.album.toLowerCase().includes(queryString) ||
+      album.artistName.toLowerCase().includes(queryString)
+    );
+  });
+  renderAlbums(results);
+}
+
+async function appInit() {
+  const res = await fetch("public/data/albums.json");
+  store = await res.json();
+  renderAlbums(store);
+}
+
+appInit();
+
 function renderAlbums(data) {
   const container = tbody.cloneNode(true); // clone the node when you need one
   data.forEach(
@@ -67,7 +81,7 @@ function renderAlbums(data) {
       artistName,
       releaseDate,
       genres,
-      averageRatings,
+      averageRating,
       numberRatings,
     }) => {
       const template = `
@@ -76,7 +90,7 @@ function renderAlbums(data) {
     <td>${artistName}</td>
     <td>${releaseDate}</td>
     <td>${genres}</td>
-    <td>${averageRatings}</td>
+    <td>${averageRating}</td>
     <td>${numberRatings}</td>
   </tr>
     `;
@@ -86,241 +100,3 @@ function renderAlbums(data) {
   // replace the tbody with the container that has the template
   document.querySelector("tbody").replaceWith(container);
 }
-
-// Fetch the album data from the projects data folder (albums.json).
-const albumData = await loadAlbumData();
-
-// Create an async function to load the album data.
-async function loadAlbumData() {
-  const response = await fetch("public/data/albums.json");
-  const data = await response.json();
-  return data;
-}
-
-// Create a variable called albumStore and assign the album data to it.
-let albumStore = [...albumData];
-
-// Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
-function orderAlbumData() {
-  albumStore.sort((a, b) => {
-    if (a.averageRating < b.averageRating) {
-      return 1;
-    }
-    if (a.averageRating > b.averageRating) {
-      return -1;
-    }
-    return 0;
-  });
-}
-// Call the function to order the album data based on the average rating and minimum reviews fields in the table.
-orderAlbumData();
-
-// Create a store variable as a data backup.
-let albumStoreCopy = [...albumStore];
-
-// Create a copy of the array data then use display templating to render the data and template into the table. add the album data into the table. Add the template data to the correct section of the table element.
-const table = document.querySelector("table");
-
-// Add header fields to the table
-let header = `
-  <tr>
-    <th>Album Name</th>
-    <th>Release Date</th>
-    <th>Artist Name</th>
-    <th>Genre</th>
-    <th>Average Rating</th>
-    <th>Number of Ratings</th>
-  </tr>
-`;
-
-// Add the album data to the table using display templating
-let template = "";
-albumStore.forEach((album) => {
-  template += `
-    <tr>
-      <td>${album.album}</td>
-      <td>${album.releaseDate}</td>
-      <td>${album.artistName}</td>
-      <td>${album.genres}</td>
-      <td>${album.averageRating}</td>
-      <td>${album.numberRatings}</td>
-    </tr>
-  `;
-});
-
-// Add the template data to the correct section of the table element
-table.innerHTML = header + template;
-
-// After the table has been rendered
-const tableCells = document.querySelectorAll("td");
-
-// Add event listeners to the table cells for sorting
-tableCells.forEach((cell) => {
-  cell.addEventListener("click", (event) => {
-    // Handle the click event here
-    console.log("Cell clicked: ", event.target.textContent);
-  });
-});
-
-// Sort the data by a specific field in the table when the header is clicked
-const albumHeader = document.querySelector("th[scope='col']:nth-child(1)");
-albumHeader.addEventListener("click", () => {
-  sortDataByField("albumName");
-  console.log("Album header clicked");
-});
-
-const releaseDateHeader = document.querySelector(
-  "th[scope='col']:nth-child(2)"
-);
-releaseDateHeader.addEventListener("click", () => {
-  sortDataByField("releaseDate");
-  console.log("Release date header clicked");
-});
-
-const artistHeader = document.querySelector("th[scope='col']:nth-child(3)");
-artistHeader.addEventListener("click", () => {
-  sortDataByField("artistName");
-  console.log("Artist header clicked");
-});
-
-const genreHeader = document.querySelector("th[scope='col']:nth-child(4)");
-genreHeader.addEventListener("click", () => {
-  sortDataByField("genres");
-});
-
-const averageRatingHeader = document.querySelector(
-  "th[scope='col']:nth-child(5)"
-);
-averageRatingHeader.addEventListener("click", () => {
-  sortDataByField("averageRating");
-  console.log("Average rating header clicked");
-});
-
-const numberRatingsHeader = document.querySelector(
-  "th[scope='col']:nth-child(6)"
-);
-numberRatingsHeader.addEventListener("click", () => {
-  sortDataByField("numberRatings");
-});
-
-// Create a function to sort the album data based on the average rating and minimum reviews fields in the table.
-function sortDataByField(field) {
-  albumStore.sort((a, b) => {
-    if (a[field] < b[field]) {
-      return 1;
-    }
-    if (a[field] > b[field]) {
-      return -1;
-    }
-    return 0;
-  });
-
-  render(albumStore);
-}
-
-// // Sort the data by release date field
-// const releaseDateCell = document.querySelector("#release-date-cell");
-// releaseDateCell.addEventListener("click", () => {
-//   sortDataByReleaseDate();
-//   console.log("Release date cell clicked");
-// });
-
-// function sortDataByReleaseDate() {
-//   albumStore.sort((a, b) => {
-//     const dateA = new Date(a.releaseDate);
-//     const dateB = new Date(b.releaseDate);
-//     return dateB - dateA;
-//   });
-
-//   render(albumStore);
-// }
-
-// Add submit event listener to the form element
-const form = document.querySelector("form");
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
-  const searchQueryValue = searchQuery.value.trim();
-  const minRatingValue = parseInt(minRating.value);
-
-  const searchResults = searchAlbums(searchQueryValue);
-  const ratingResults = searchByRating(minRatingValue);
-
-  if (searchResults && ratingResults) {
-    const filteredResults = searchResults.filter((album) =>
-      ratingResults.includes(album)
-    );
-    render(filteredResults);
-    console.log(filteredResults);
-  } else if (searchResults) {
-    render(searchResults);
-    console.log(searchResults);
-  } else if (ratingResults) {
-    render(ratingResults);
-    console.log(ratingResults);
-  } else {
-    render(albumStore);
-  }
-});
-
-// Get the search query and minimum rating.
-const searchQuery = document.querySelector("#search");
-const minRating = document.querySelector("#rating");
-
-// Text input field for the search query.
-function searchAlbums(query) {
-  const searchResults = albumStore.filter((album) => {
-    return (
-      album.artist.toLowerCase().includes(query.toLowerCase()) ||
-      album.artistName.toLowerCase().includes(query.toLowerCase())
-    );
-  });
-  return searchResults;
-}
-
-// Number Text Field Search
-function searchByRating(rating) {
-  const searchResults = albumStore.filter((album) => {
-    return album.numberRating >= rating;
-  });
-  return searchResults;
-}
-
-// Render Function
-function render(data) {
-  const table = document.querySelector("table");
-  let template = "";
-  data.forEach((album) => {
-    template += `
-      <tr>
-        <td>${album.albumName}</td>
-        <td>${album.releaseDate}</td>
-        <td>${album.artistName}</td>
-        <td>${album.genre}</td>
-        <td>${album.averageRating}</td>
-        <td>${album.numberRating}</td>
-      </tr>
-    `;
-  });
-  table.innerHTML = template;
-}
-
-// Add event listeners to the table cells
-tableCells.forEach((cell) => {
-  cell.addEventListener("click", (event) => {
-    // Handle the click event here
-    console.log("Cell clicked: ", event.target.textContent);
-  });
-});
-
-// Add event listeners to the average rating and number of ratings cells for sorting
-const averageRatingCell = document.querySelector("#average-rating-cell");
-const numberOfRatingsCell = document.querySelector("#number-of-ratings-cell");
-
-averageRatingCell.addEventListener("click", () => {
-  sortDataByField("averageRating");
-  console.log("Average rating cell clicked");
-});
-
-numberOfRatingsCell.addEventListener("click", () => {
-  sortDataByField("numberRating");
-});
