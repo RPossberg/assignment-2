@@ -1,3 +1,4 @@
+console.log("Index.js is connected");
 /*
 CPSC1520 Client-Side Development
 *Task 1: Data Fetch and Display Templating
@@ -19,21 +20,6 @@ Get the search query and minimum rating.
   Order the album data based on the average rating and minimum reviews fields in the table. Add an event to the two cells and listen for the click event. Sort the data from highest to lowest value. If the data is already sorted, then reverse the order of the data. Use the sort method to sort the data. Use the reverse method to reverse the order of the data. Use the render function to update the table display with the sorted data.
 *Task 4:
   Sort the data by release date field. The data should be sorted from the highest to lowest (lowest means the date closes to today). Sort the data from highest to lowest value. If the data is already sorted, then reverse the order of the data. Use the sort method to sort the data. Use the reverse method to reverse the order of the data. Use the render function to update the table display with the sorted data.
-*/
-/*
-<tr>
-  <td>ALBUM NAME HERE</td>
-  <td>RELEASE DATE HERE</td>
-  <td>ARTIST NAME HERE</td>
-  <td>GENRE HERE</td>
-  <td>AVERAGE RATING HERE</td>
-  <td>NUMBER OF RATINGS HERE</td>
-</tr>;
-*/
-// Add event listeners to the table cells
-/*
-  Top Level References
-</tr>;
 */
 
 let store;
@@ -70,15 +56,15 @@ async function appInit() {
   renderAlbums(store);
 }
 
-appInit();
+appInit(); // Call the function to start the app
 
 function renderAlbums(data) {
   const container = tbody.cloneNode(true); // clone the node when you need one
   data.forEach(
     ({
       album,
-      artistName,
       releaseDate,
+      artistName,
       genres,
       averageRating,
       numberRatings,
@@ -86,8 +72,8 @@ function renderAlbums(data) {
       const template = `
     <tr>
     <td>${album}</td>
-    <td>${artistName}</td>
     <td>${releaseDate}</td>
+    <td>${artistName}</td>
     <td>${genres}</td>
     <td>${averageRating}</td>
     <td>${numberRatings}</td>
@@ -98,4 +84,85 @@ function renderAlbums(data) {
   );
   // replace the tbody with the container that has the template
   document.querySelector("tbody").replaceWith(container);
+}
+
+// Define the table headers
+const tableHeaders = document.querySelectorAll("th");
+
+// Loop through each header
+tableHeaders.forEach((header) => {
+  // Add a click event listener
+  header.addEventListener("click", async () => {
+    // Get the filter attribute
+    const filter = header.getAttribute("data-filter");
+    console.log("Header clicked: ", filter);
+    // If the header has a filter attribute, sort by that field
+    if (filter) {
+      try {
+        const sortedData = await sortDataByField(filter);
+        render(sortedData);
+      } catch (error) {
+        console.error("Error sorting data: ", error);
+      }
+    }
+  });
+});
+
+async function sortDataByField(field) {
+  // Fetch the data
+  const response = await fetch("public/data/albums.json");
+  const data = await response.json();
+  // Make a non-destructive copy of the data
+  const dataCopy = [...data];
+  console.log("Data copy: ", dataCopy);
+
+  // Sort the copied data
+  dataCopy.sort((a, b) => {
+    if (a[field] && b[field]) {
+      return a[field].localeCompare(b[field]);
+    } else {
+      return 0;
+    }
+  });
+
+  // Transform the data to match what the render function expects
+  const transformedData = dataCopy.map((item) => ({
+    album: item.album,
+    releaseDate: item.releaseDate,
+    artistName: item.artistName,
+    genres: item.genres,
+    averageRating: item.averageRating,
+    numberRatings: item.numberRatings,
+  }));
+
+  return transformedData;
+}
+
+// Function to render data
+function render(data) {
+  const container = document.querySelector("tbody");
+  // Clear the existing rows
+  container.innerHTML = "";
+  data.forEach(
+    ({
+      album,
+      releaseDate,
+      artistName,
+      genres,
+      averageRating,
+      numberRatings,
+    }) => {
+      const template = `
+    <tr>
+    <td>${album}</td>
+    <td>${releaseDate}</td>
+    <td>${artistName}</td>
+    <td>${genres}</td>
+    <td>${averageRating}</td>
+    <td>${numberRatings}</td>
+  </tr>
+    `;
+      container.insertAdjacentHTML("beforeend", template);
+    }
+  );
 }
