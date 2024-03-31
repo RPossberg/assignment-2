@@ -49,10 +49,6 @@ async function onAlbumSearch(e) {
   const rating = formData.get("rating");
   console.log("Rating: ", rating);
   const albums = searchFilter(query, store);
-  // if (!albums) {
-  //   console.error('Albums data is not available');
-  //   return;
-  // }
   const filteredAlbums = ratingFilter(rating, albums);
   renderAlbums(filteredAlbums);
 }
@@ -62,7 +58,6 @@ function searchFilter(query, data) {
   const queryString = query.toLowerCase();
   const averageRatings = parseInt(query);
   let results = []; // Initialize results as an empty array
-
   if (averageRatings) {
     results = data.filter((album) => {
       return (
@@ -126,6 +121,7 @@ let sortAscending = true;
 tableHeaders.forEach((header) => {
   header.addEventListener("click", async () => {
     const filter = header.getAttribute("data-filter");
+    console.log("Filter: ", filter);
     if (filter) {
       try {
         // If the same header is clicked again, reverse the sort direction
@@ -155,7 +151,6 @@ async function sortDataByField(field) {
   const data = await response.json();
   // Make a non-destructive copy of the data
   const dataCopy = [...data];
-  console.log("Data copy: ", dataCopy);
 
   // Sort the copied data
   dataCopy.sort((a, b) => {
