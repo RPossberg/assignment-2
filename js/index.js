@@ -100,7 +100,7 @@ function renderAlbums(data) {
       artistName,
       genres,
       averageRating,
-      numberRatings,
+      numberReviews,
     }) => {
       const template = `
     <tr>
@@ -109,7 +109,7 @@ function renderAlbums(data) {
     <td>${artistName}</td>
     <td>${genres}</td>
     <td>${averageRating}</td>
-    <td>${numberRatings}</td>
+    <td>${numberReviews}</td>
   </tr>
     `;
       container.insertAdjacentHTML("beforeend", template); // add the template to the container
@@ -122,17 +122,27 @@ function renderAlbums(data) {
 // Define the table headers
 const tableHeaders = document.querySelectorAll("th");
 
-// Loop through each header
+let lastClickedHeader = null;
+let sortAscending = true;
+
 tableHeaders.forEach((header) => {
-  // Add a click event listener
   header.addEventListener("click", async () => {
-    // Get the filter attribute
     const filter = header.getAttribute("data-filter");
-    console.log("Header clicked: ", filter);
-    // If the header has a filter attribute, sort by that field
     if (filter) {
       try {
+        // If the same header is clicked again, reverse the sort direction
+        if (lastClickedHeader === filter) {
+          sortAscending = !sortAscending;
+        } else {
+          // If a different header is clicked, sort in ascending order
+          sortAscending = true;
+        }
+        lastClickedHeader = filter;
+
         const sortedData = await sortDataByField(filter);
+        if (!sortAscending) {
+          sortedData.reverse();
+        }
         render(sortedData);
       } catch (error) {
         console.error("Error sorting data: ", error);
@@ -183,6 +193,11 @@ async function sortDataByField(field) {
       comparison = Number(a.averageRating) - Number(b.averageRating);
     }
 
+    // If the averageRating comparison is also equal, sort by numberReviews
+    if (comparison === 0 && field !== "numberReviews") {
+      comparison = Number(a.numberReviews) - Number(b.numberReviews);
+    }
+
     return comparison;
   });
 
@@ -193,7 +208,7 @@ async function sortDataByField(field) {
     artistName: item.artistName,
     genres: item.genres,
     averageRating: item.averageRating,
-    numberRatings: item.numberRatings,
+    numberReviews: item.numberReviews,
   }));
 
   return transformedData;
@@ -211,7 +226,7 @@ function render(data) {
       artistName,
       genres,
       averageRating,
-      numberRatings,
+      numberReviews,
     }) => {
       const template = `
     <tr>
@@ -220,7 +235,7 @@ function render(data) {
     <td>${artistName}</td>
     <td>${genres}</td>
     <td>${averageRating}</td>
-    <td>${numberRatings}</td>
+    <td>${numberReviews}</td>
   </tr>
     `;
       container.insertAdjacentHTML("beforeend", template);
