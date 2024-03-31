@@ -23,13 +23,13 @@ Get the search query and minimum rating.
 */
 
 let store;
-
 let tbody = document.querySelector("tbody").cloneNode(true);
 const reviewFilter = document.getElementById("reviews");
 const ratingsFilter = document.getElementById("ratings");
 const albumForm = document.querySelector("form");
 albumForm.addEventListener("submit", onAlbumSearch);
 
+// Function to handle the form submission
 function onAlbumSearch(e) {
   e.preventDefault();
   const formData = new FormData(e.currentTarget);
@@ -38,16 +38,29 @@ function onAlbumSearch(e) {
   const albums = searchFilter(query, store);
 }
 
+// Function to search the data based on the query
 function searchFilter(query, data) {
   const queryString = query.toLowerCase();
-
-  const results = data.filter((album) => {
-    return (
-      album.album.toLowerCase().includes(queryString) ||
-      album.artistName.toLowerCase().includes(queryString)
-    );
-  });
-  renderAlbums(results);
+  const averageRatings = parseInt(query);
+  console.log("Query: ", queryString);
+  if (averageRatings) {
+    const results = data.filter((album) => {
+      return (
+        album.album.toLowerCase().includes(queryString) ||
+        album.artistName.toLowerCase().includes(queryString) ||
+        album.averageRating >= averageRatings
+      );
+    });
+    renderAlbums(results);
+  } else {
+    const results = data.filter((album) => {
+      return (
+        album.album.toLowerCase().includes(queryString) ||
+        album.artistName.toLowerCase().includes(queryString)
+      );
+    });
+    renderAlbums(results);
+  }
 }
 
 async function appInit() {
