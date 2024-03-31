@@ -151,17 +151,39 @@ async function sortDataByField(field) {
 
   // Sort the copied data
   dataCopy.sort((a, b) => {
+    let comparison = 0;
+
     if (a[field] && b[field]) {
       if (typeof a[field] === "string" && typeof b[field] === "string") {
-        return a[field].localeCompare(b[field]);
-      } else if (typeof a[field] === "number" && typeof b[field] === "number") {
-        return a[field] - b[field];
+        comparison = a[field]
+          .trim()
+          .toLowerCase()
+          .localeCompare(b[field].trim().toLowerCase());
       } else {
-        return 0;
+        // Convert to numbers before comparing
+        const numA = Number(a[field]);
+        const numB = Number(b[field]);
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+          comparison = numA - numB;
+        }
       }
-    } else {
-      return 0;
     }
+
+    // If the primary comparison is equal, sort by artistName
+    if (comparison === 0 && field !== "artistName") {
+      comparison = a.artistName
+        .trim()
+        .toLowerCase()
+        .localeCompare(b.artistName.trim().toLowerCase());
+    }
+
+    // If the artistName comparison is also equal, sort by averageRating
+    if (comparison === 0 && field !== "averageRating") {
+      comparison = Number(a.averageRating) - Number(b.averageRating);
+    }
+
+    return comparison;
   });
 
   // Transform the data to match what the render function expects
