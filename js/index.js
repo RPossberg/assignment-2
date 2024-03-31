@@ -152,7 +152,13 @@ async function sortDataByField(field) {
   // Sort the copied data
   dataCopy.sort((a, b) => {
     if (a[field] && b[field]) {
-      return a[field].localeCompare(b[field]);
+      if (typeof a[field] === "string" && typeof b[field] === "string") {
+        return a[field].localeCompare(b[field]);
+      } else if (typeof a[field] === "number" && typeof b[field] === "number") {
+        return a[field] - b[field];
+      } else {
+        return 0;
+      }
     } else {
       return 0;
     }
