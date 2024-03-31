@@ -23,44 +23,64 @@ Get the search query and minimum rating.
 */
 
 let store;
+// Get the table body
 let tbody = document.querySelector("tbody").cloneNode(true);
-const reviewFilter = document.getElementById("reviews");
+// Get the form element
+const albumFilter = document.getElementById("album");
 const ratingsFilter = document.getElementById("ratings");
 const albumForm = document.querySelector("form");
 albumForm.addEventListener("submit", onAlbumSearch);
 
+// Function to filter the data based on the minimum rating
+function ratingFilter(minRating, data) {
+  const numRating = Number(minRating); // convert minRating to a number
+  const results = data.filter((album) => {
+    return album.averageRating >= numRating;
+  });
+  return results;
+}
+
 // Function to handle the form submission
-function onAlbumSearch(e) {
+async function onAlbumSearch(e) {
   e.preventDefault();
   const formData = new FormData(e.currentTarget);
   const query = formData.get("search");
+  console.log("Query: ", query);
   const rating = formData.get("rating");
+  console.log("Rating: ", rating);
   const albums = searchFilter(query, store);
+  // if (!albums) {
+  //   console.error('Albums data is not available');
+  //   return;
+  // }
+  const filteredAlbums = ratingFilter(rating, albums);
+  renderAlbums(filteredAlbums);
 }
 
 // Function to search the data based on the query
 function searchFilter(query, data) {
   const queryString = query.toLowerCase();
   const averageRatings = parseInt(query);
-  console.log("Query: ", queryString);
+  let results = []; // Initialize results as an empty array
+
   if (averageRatings) {
-    const results = data.filter((album) => {
+    results = data.filter((album) => {
       return (
         album.album.toLowerCase().includes(queryString) ||
         album.artistName.toLowerCase().includes(queryString) ||
         album.averageRating >= averageRatings
       );
     });
-    renderAlbums(results);
   } else {
-    const results = data.filter((album) => {
+    results = data.filter((album) => {
       return (
         album.album.toLowerCase().includes(queryString) ||
         album.artistName.toLowerCase().includes(queryString)
       );
     });
-    renderAlbums(results);
   }
+
+  return results; // Always return an array
 }
 
 async function appInit() {
