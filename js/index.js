@@ -121,10 +121,8 @@ function renderAlbums(data) {
 
 // Define the table headers
 const tableHeaders = document.querySelectorAll("th");
-
 let lastClickedHeader = null;
 let sortAscending = true;
-
 tableHeaders.forEach((header) => {
   header.addEventListener("click", async () => {
     const filter = header.getAttribute("data-filter");
